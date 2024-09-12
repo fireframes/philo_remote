@@ -1,0 +1,14 @@
+
+3. CHECK TIME CONVERSIONS AGAIN
+
+5. Test 1 800 200 200. The philosopher should not eat and should die.  ---> means that there is an monitoring thread, checking for potential death??
+
+make a separate thread that checks the death condition
+
+6. init monitor thread to check each phil's
+	- death state (check time in several places in phil routine)
+	- time_eaten
+
+maybe problem with timestamps/ print 
+
+1. SPECIAL CASE FOR 1 PHIL

@@ -1,14 +1,83 @@
 
+General Observations
+Modular Structure: You've separated initialization (init_phils), monitoring (monitor_routine), and timing functions (set_basetime_us, get_timestamp_us), which makes your code cleaner and easier to understand.
+Threading: The usage of threads and mutexes is appropriate for the philosophers problem, but there are some potential improvements to handle thread safety, resource cleanup, and argument validation more effectively.
+File-by-File Review:
+1. main.c
+What’s Good:
+
+Argument Checking (check_argc): You’ve implemented a check to validate the number of arguments passed to the program.
+Thread Creation: You’re correctly creating philosopher threads and a monitor thread.
+Cleanup (cleanup): You’ve provided a cleanup routine to join threads and destroy mutexes, ensuring resources are cleaned up after the simulation.
+Suggestions:
+
+Argument Conversion:
+
+Instead of using atoi, which doesn’t handle errors, consider using strtol or a custom parsing function to properly validate the inputs.
+For instance, atoi will return 0 if the input is invalid (non-numeric), which could be problematic when passing arguments for time values.
+Also, ensure the number of philosophers is within a valid range, e.g., 1 <= num_of_phils <= 200.
+Error Handling:
+
+When creating threads with pthread_create or joining them with pthread_join, check for the specific error codes and handle failures more explicitly. Instead of just printing an error message, you might want to ensure that resources are properly cleaned up and the simulation ends gracefully.
+Memory Management:
+
+When freeing memory for phil_arr and phils_init->forks, ensure you’ve allocated the exact number of philosophers and forks correctly.
+In cleanup(), free(phils_init->forks) and free(phil_arr) are valid, but adding comments to clarify that these free all the elements (due to the use of malloc) can prevent misunderstandings.
+Monitor Thread Joining:
+
+You are creating a monitor thread but joining it at the end of the simulation (pthread_join(monitor_th, NULL)). Consider moving this logic to ensure proper handling of thread completion and that the monitor thread exits gracefully when one philosopher dies.
+2. init_phils.c
+What’s Good:
+
+Initialization Logic: You correctly initialize the number of philosophers, time parameters (in microseconds), and mutexes for forks.
+Dynamic Memory Allocation: You dynamically allocate memory for the philosopher and fork arrays, which is necessary for scalability.
+Suggestions:
+
+Mutex Initialization:
+You should handle potential errors from pthread_mutex_init. If a mutex initialization fails, ensure you can handle it by cleaning up already initialized mutexes or safely exiting the program.
+Input Validation:
+Before converting arguments, ensure they are valid numbers and within an acceptable range. For example, if a negative number or non-numeric value is passed for time_to_die, time_to_eat, or time_to_sleep, the simulation will behave unpredictably.
+3. monitor_routine.c
+What’s Good:
+
+Continuous Monitoring: The monitor loop effectively checks each philosopher’s status in a continuous loop, allowing you to stop the simulation when one philosopher dies.
+Suggestions:
+
+Exiting the Simulation:
+When a philosopher dies, instead of just printing "SIMULATION STOPS..." and exiting, consider setting a shared variable (e.g., simulation_run) that all philosopher threads can check. This would allow for a more orderly termination of the simulation.
+Thread Safety:
+You commented out the use of a mutex to protect the simulation_run flag. This could be important if multiple threads need to check and modify this flag. Reconsider adding it back to ensure thread safety when stopping the simulation.
+Resource Cleanup:
+After the simulation stops, you should properly clean up the philosopher threads and mutexes. The cleanup function could be called from within the monitor thread to avoid resource leaks.
+4. timing_functions.c
+What’s Good:
+
+Simple and Effective: The timing functions (set_basetime_us and get_timestamp_us) are simple, easy to understand, and effective for measuring time differences.
+Suggestions:
+
+Error Handling for gettimeofday:
+You should add error checking for gettimeofday. Although it rarely fails, it’s good practice to handle this case (e.g., by printing an error message and exiting the program if the call fails).
+Additional Recommendations:
+Thread Synchronization and Data Safety:
+
+Consider adding more synchronization between the monitor thread and philosopher threads. For example, using condition variables or signals to notify threads when the simulation ends could avoid potential race conditions or deadlocks.
+Graceful Shutdown:
+
+When a philosopher dies, it's better to signal all other threads (philosophers and the monitor thread) to stop and then ensure all resources (mutexes, threads) are cleaned up properly. This prevents leaving threads hanging when a philosopher dies.
+Conclusion:
+Your implementation is solid, and the structure is clear. By adding a few more checks for error handling, improving the memory management, and handling thread termination more gracefully, you can make the program more robust and reliable.
+
+
+
+1. SPECIAL CASE FOR 1 PHIL
+
 3. CHECK TIME CONVERSIONS AGAIN
 
 5. Test 1 800 200 200. The philosopher should not eat and should die.  ---> means that there is an monitoring thread, checking for potential death??
 
-make a separate thread that checks the death condition
-
 6. init monitor thread to check each phil's
-	- death state (check time in several places in phil routine)
+	- death state
 	- time_eaten
 
 maybe problem with timestamps/ print 
 
-1. SPECIAL CASE FOR 1 PHIL

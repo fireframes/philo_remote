@@ -6,7 +6,7 @@
 /*   By: mmaksimo <mmaksimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 22:09:02 by mmaksimo          #+#    #+#             */
-/*   Updated: 2024/09/12 18:29:11 by mmaksimo         ###   ########.fr       */
+/*   Updated: 2024/09/17 23:12:30 by mmaksimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,9 +38,9 @@ typedef struct s_phils_init
 	uint64_t		time_to_eat;
 	uint64_t		time_to_sleep;
 	uint64_t		basetime_us;
-	bool			simulation_run;
-	pthread_mutex_t	simulation_mutex;
-	pthread_mutex_t	*forks;
+	// bool			simulation_run;
+	// pthread_mutex_t	simulation_mutex;
+	pthread_mutex_t	*forks; // mutex for accessing pointer
 
 }	t_phils_init;
 
@@ -52,7 +52,7 @@ typedef struct s_phil
 	uint64_t		last_meal_time_us;
 	int				times_eaten;
 	int				forks_taken; // ???
-	bool			is_alive; // ???
+	bool			is_dead; // ???
 	t_phils_init	*phils_init;
 
 }	t_phil;
@@ -62,5 +62,6 @@ void			*phil_routine(void *arg);
 void			*monitor_routine(void *arg);
 uint64_t		set_basetime_us(void);
 uint64_t		get_timestamp_us(uint64_t basetime_us);
+void			cleanup(t_phils_init *phils_init, t_phil *phil_arr);
 
 #endif

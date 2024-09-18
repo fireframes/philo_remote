@@ -6,7 +6,7 @@
 /*   By: mmaksimo <mmaksimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 22:13:03 by mmaksimo          #+#    #+#             */
-/*   Updated: 2024/09/17 20:54:39 by mmaksimo         ###   ########.fr       */
+/*   Updated: 2024/09/18 20:05:38 by mmaksimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,8 @@ t_phils_init	*init_phils(t_phils_init *phils_init, int argc, char *argv[])
 	if (argc == 6)
 		phils_init->phil_eat_times = atoi(argv[5]);
 	phils_init->basetime_us = set_basetime_us();
-	// phils_init->simulation_run = true;
-	// pthread_mutex_init(&phils_init->simulation_mutex, NULL);
+	phils_init->stop_simulation = false;
+	pthread_mutex_init(&phils_init->stop_simulation_mutex, NULL);
 	phils_init->forks = malloc(sizeof(pthread_mutex_t) * phils_init->num_of_phils);
 	if (!phils_init->forks)
 		return (NULL);

@@ -6,7 +6,7 @@
 /*   By: mmaksimo <mmaksimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 22:08:50 by mmaksimo          #+#    #+#             */
-/*   Updated: 2024/09/17 23:01:38 by mmaksimo         ###   ########.fr       */
+/*   Updated: 2024/09/18 20:34:44 by mmaksimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,9 @@ bool	death_check(t_phil *phil)
 	time_us = get_timestamp_us(phil->phils_init->basetime_us);
 	if ((time_us - phil->last_meal_time_us) > phil->phils_init->time_to_die)
 	{
+		pthread_mutex_lock(&phil->is_dead_mutex);
 		phil->is_dead = true;
+		pthread_mutex_unlock(&phil->is_dead_mutex);
 		return (true);
 	}
 	return (false);
@@ -30,8 +32,8 @@ void	thinking_subroutine(t_phil *phil)
 	uint64_t	time_us;
 
 	time_us = get_timestamp_us(phil->phils_init->basetime_us);
-	printf("%s%li %i is thinking%s\n", 
-			PURPLE, (time_us / 1000), 
+	printf("%s%li %i is thinking%s\n",
+			PURPLE, (time_us / 1000),
 			phil->phil_id, NC);
 }
 
@@ -49,7 +51,7 @@ void	eating_subroutine(t_phil *phil)
 void	sleeping_subroutine(t_phil *phil)
 {
 	uint64_t	time_us;
-	
+
 	time_us = get_timestamp_us(phil->phils_init->basetime_us);
 	printf("%s%li %i is sleeping%s\n", BLUE, (time_us / 1000), phil->phil_id, NC);
 	usleep(phil->phils_init->time_to_sleep);
@@ -84,15 +86,25 @@ void	*phil_routine(void *arg)
 	}
 	while (1)
 	{
+		pthread_mutex_lock(&phil->phils_init->stop_simulation_mutex);
+		if (phil->phils_init->stop_simulation)
+		{
+			pthread_mutex_unlock(&phil->phils_init->stop_simulation_mutex);
+			break ;
+		}
+		pthread_mutex_unlock(&phil->phils_init->stop_simulation_mutex);
+
+		if (death_check(phil) == true)
+			break ;
 		lock_fork_subroutine(phil, 1);
 		if (phil->phils_init->num_of_phils > 1)
 			lock_fork_subroutine(phil, 2);
 		if (death_check(phil) == true)
 			break ;
 		eating_subroutine(phil);
-		// if (death_check(phil) == true)
-		// 	break ;
 		unlock_fork_subroutine(phil);
+		if (death_check(phil) == true)
+			break ;
 		sleeping_subroutine(phil);
 		if (death_check(phil) == true)
 			break ;

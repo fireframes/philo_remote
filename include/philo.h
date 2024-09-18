@@ -6,7 +6,7 @@
 /*   By: mmaksimo <mmaksimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 22:09:02 by mmaksimo          #+#    #+#             */
-/*   Updated: 2024/09/17 23:12:30 by mmaksimo         ###   ########.fr       */
+/*   Updated: 2024/09/18 20:29:11 by mmaksimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,8 +38,8 @@ typedef struct s_phils_init
 	uint64_t		time_to_eat;
 	uint64_t		time_to_sleep;
 	uint64_t		basetime_us;
-	// bool			simulation_run;
-	// pthread_mutex_t	simulation_mutex;
+	bool			stop_simulation;
+	pthread_mutex_t	stop_simulation_mutex;
 	pthread_mutex_t	*forks; // mutex for accessing pointer
 
 }	t_phils_init;
@@ -52,6 +52,7 @@ typedef struct s_phil
 	uint64_t		last_meal_time_us;
 	int				times_eaten;
 	int				forks_taken; // ???
+	pthread_mutex_t	is_dead_mutex;
 	bool			is_dead; // ???
 	t_phils_init	*phils_init;
 

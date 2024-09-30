@@ -6,7 +6,7 @@
 /*   By: mmaksimo <mmaksimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/12 16:58:19 by mmaksimo          #+#    #+#             */
-/*   Updated: 2024/09/18 20:35:33 by mmaksimo         ###   ########.fr       */
+/*   Updated: 2024/09/30 23:47:07 by mmaksimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ void	*monitor_routine(void *arg)
 	int		num_of_phils;
 	int		i;
 
-	int stop_flag = 0;
 	phil_arr = (t_phil*) arg;
 	num_of_phils = phil_arr->phils_init->num_of_phils;
 	while (1)
@@ -50,16 +49,14 @@ void	*monitor_routine(void *arg)
 				uint64_t	time_us;
 				time_us = get_timestamp_us(phil_arr[i].phils_init->basetime_us);
 				printf("%s%li %i died%s\n", BLACK, time_us / 1000, phil_arr[i].phil_id, NC);
-				// stop_flag = 1;
+				
 				pthread_mutex_unlock(&phil_arr[i].is_dead_mutex);
 				return (NULL);
 			}
 			pthread_mutex_unlock(&phil_arr[i].is_dead_mutex);
 			i++;
-			// usleep(100);
+			usleep(10);
 		}
-		if (stop_flag)
-			break ;
 	}
 	return (NULL);
 }

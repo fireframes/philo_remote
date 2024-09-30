@@ -71,13 +71,9 @@ Your implementation is solid, and the structure is clear. By adding a few more c
 
 1. SPECIAL CASE FOR 1 PHIL
 
-3. CHECK TIME CONVERSIONS AGAIN
+ Test 1 800 200 200. The philosopher should not eat and should die.  ---> means that there is an monitoring thread, checking for potential death??
 
-5. Test 1 800 200 200. The philosopher should not eat and should die.  ---> means that there is an monitoring thread, checking for potential death??
+6. monitor thread to check each phil's
+	- times_eaten
 
-6. init monitor thread to check each phil's
-	- death state
-	- time_eaten
-
-maybe problem with timestamps/ print 
 

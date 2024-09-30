@@ -6,7 +6,7 @@
 /*   By: mmaksimo <mmaksimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 22:08:50 by mmaksimo          #+#    #+#             */
-/*   Updated: 2024/09/18 20:34:44 by mmaksimo         ###   ########.fr       */
+/*   Updated: 2024/09/30 23:44:14 by mmaksimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,18 @@ bool	death_check(t_phil *phil)
 		pthread_mutex_unlock(&phil->is_dead_mutex);
 		return (true);
 	}
+	return (false);
+}
+
+bool	simulation_ended(t_phil *phil)
+{
+	pthread_mutex_lock(&phil->phils_init->stop_simulation_mutex);
+	if (phil->phils_init->stop_simulation)
+	{
+		pthread_mutex_unlock(&phil->phils_init->stop_simulation_mutex);
+		return (true) ;
+	}
+	pthread_mutex_unlock(&phil->phils_init->stop_simulation_mutex);
 	return (false);
 }
 
@@ -86,27 +98,19 @@ void	*phil_routine(void *arg)
 	}
 	while (1)
 	{
-		pthread_mutex_lock(&phil->phils_init->stop_simulation_mutex);
-		if (phil->phils_init->stop_simulation)
-		{
-			pthread_mutex_unlock(&phil->phils_init->stop_simulation_mutex);
-			break ;
-		}
-		pthread_mutex_unlock(&phil->phils_init->stop_simulation_mutex);
-
-		if (death_check(phil) == true)
+		if (death_check(phil) || simulation_ended(phil))
 			break ;
 		lock_fork_subroutine(phil, 1);
+		if (death_check(phil) || simulation_ended(phil))
+			break ;
 		if (phil->phils_init->num_of_phils > 1)
 			lock_fork_subroutine(phil, 2);
-		if (death_check(phil) == true)
-			break ;
 		eating_subroutine(phil);
-		unlock_fork_subroutine(phil);
-		if (death_check(phil) == true)
+		if (death_check(phil) || simulation_ended(phil))
 			break ;
+		unlock_fork_subroutine(phil);
 		sleeping_subroutine(phil);
-		if (death_check(phil) == true)
+		if (death_check(phil) || simulation_ended(phil))
 			break ;
 		thinking_subroutine(phil);
 	}

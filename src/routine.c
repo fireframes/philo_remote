@@ -6,7 +6,7 @@
 /*   By: mmaksimo <mmaksimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 22:08:50 by mmaksimo          #+#    #+#             */
-/*   Updated: 2024/09/30 23:44:14 by mmaksimo         ###   ########.fr       */
+/*   Updated: 2024/10/08 18:06:36 by mmaksimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,18 +85,46 @@ void	unlock_fork_subroutine(t_phil *phil)
 	if (phil->phils_init->num_of_phils > 1)
 		pthread_mutex_unlock(&phil->phils_init->forks[phil->phil_id - 2]);
 }
+void single_phil_routine(t_phil *phil)
+{
+	while (!death_check(phil) || !simulation_ended(phil))
+	{
+		if (death_check(phil) || simulation_ended(phil))
+			return ;
+		lock_fork_subroutine(phil, 1);
+		if (death_check(phil) || simulation_ended(phil))
+			return ;
+		if (phil->phils_init->num_of_phils > 1)
+			lock_fork_subroutine(phil, 2);
+		eating_subroutine(phil);
+		if (death_check(phil) || simulation_ended(phil))
+			return ;
+		unlock_fork_subroutine(phil);
+		sleeping_subroutine(phil);
+		// if (death_check(phil) || simulation_ended(phil))
+		// 	return ;
+		thinking_subroutine(phil);
+		printf("DOING\n");
+	}
+}
+
 
 void	*phil_routine(void *arg)
 {
 	t_phil		*phil;
 
 	phil = (t_phil*) arg;
-	if (phil->phils_init->num_of_phils > 1 && phil->phil_id % 2 == 0)
+	if (phil->phils_init->num_of_phils == 1)
+	{
+		single_phil_routine(phil);
+		return (NULL);
+	}
+	if (phil->phil_id % 2 == 0)
 	{
 		thinking_subroutine(phil);
-		usleep(10);
+		// usleep(10);
 	}
-	while (1)
+	while (!death_check(phil) || !simulation_ended(phil))
 	{
 		if (death_check(phil) || simulation_ended(phil))
 			break ;

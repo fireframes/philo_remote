@@ -6,7 +6,7 @@
 /*   By: mmaksimo <mmaksimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/12 15:32:03 by mmaksimo          #+#    #+#             */
-/*   Updated: 2024/10/01 00:28:44 by mmaksimo         ###   ########.fr       */
+/*   Updated: 2024/10/08 18:07:11 by mmaksimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,22 +91,8 @@ int	main(int argc, char *argv[])
 		free(phil_arr); // frees all?
 		return (3);
 	}
-	if (pthread_join(monitor_th, NULL) != 0)
-	{
-		write(STDERR_FILENO, "Failed to join thread\n", 23);
-		return (5);
-	}
+
 	int j = 0;
-	while (j < phils_init.num_of_phils)
-	{
-		if (pthread_join(phil_arr[j].thread_id, NULL) != 0)
-		{
-			write(STDERR_FILENO, "Failed to join thread\n", 23);
-			break ;
-		}
-		j++;
-	}
-	j = 0;
 	while (j < phils_init.num_of_phils)
 	{
 		pthread_mutex_destroy(&phils_init.forks[j]);
@@ -114,10 +100,21 @@ int	main(int argc, char *argv[])
 	}
 	pthread_mutex_destroy(&phil_arr[i].is_dead_mutex);
 	pthread_mutex_destroy(&phils_init.stop_simulation_mutex);
+
+	if (pthread_join(monitor_th, NULL) != 0)
+	{
+		write(STDERR_FILENO, "Failed to join thread\n", 23);
+		return (5);
+	}
+	j = 0;
+	while (j < phils_init.num_of_phils)
+	{
+		pthread_join(phil_arr[j].thread_id, NULL);
+		j++;
+	}
+
 	free(phils_init.forks);
 	free(phil_arr);
-	
-	// cleanup(&phils_init, phil_arr);
 
 	printf("SIMULATION ENDED.\n");
 	return (0);

@@ -6,7 +6,7 @@
 /*   By: mmaksimo <mmaksimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 22:08:50 by mmaksimo          #+#    #+#             */
-/*   Updated: 2024/10/08 18:06:36 by mmaksimo         ###   ########.fr       */
+/*   Updated: 2024/10/23 19:03:25 by mmaksimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,9 +54,9 @@ void	eating_subroutine(t_phil *phil)
 	uint64_t	time_us;
 
 	time_us = get_timestamp_us(phil->phils_init->basetime_us);
+	phil->last_meal_time_us = get_timestamp_us(phil->phils_init->basetime_us);
 	printf("%s%li %i is eating%s\n", YELLOW, time_us / 1000, phil->phil_id, NC);
 	usleep(phil->phils_init->time_to_eat);
-	phil->last_meal_time_us = get_timestamp_us(phil->phils_init->basetime_us);
 
 }
 

@@ -6,7 +6,7 @@
 /*   By: mmaksimo <mmaksimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 22:08:50 by mmaksimo          #+#    #+#             */
-/*   Updated: 2024/10/23 19:03:25 by mmaksimo         ###   ########.fr       */
+/*   Updated: 2024/11/26 14:44:29 by mmaksimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,25 +87,7 @@ void	unlock_fork_subroutine(t_phil *phil)
 }
 void single_phil_routine(t_phil *phil)
 {
-	while (!death_check(phil) || !simulation_ended(phil))
-	{
-		if (death_check(phil) || simulation_ended(phil))
-			return ;
-		lock_fork_subroutine(phil, 1);
-		if (death_check(phil) || simulation_ended(phil))
-			return ;
-		if (phil->phils_init->num_of_phils > 1)
-			lock_fork_subroutine(phil, 2);
-		eating_subroutine(phil);
-		if (death_check(phil) || simulation_ended(phil))
-			return ;
-		unlock_fork_subroutine(phil);
-		sleeping_subroutine(phil);
-		// if (death_check(phil) || simulation_ended(phil))
-		// 	return ;
-		thinking_subroutine(phil);
-		printf("DOING\n");
-	}
+	return ;
 }
 
 
@@ -120,26 +102,17 @@ void	*phil_routine(void *arg)
 		return (NULL);
 	}
 	if (phil->phil_id % 2 == 0)
+		usleep(phil->phils_init->time_to_eat);
+	while (1)
 	{
-		thinking_subroutine(phil);
-		// usleep(10);
-	}
-	while (!death_check(phil) || !simulation_ended(phil))
-	{
-		if (death_check(phil) || simulation_ended(phil))
+		if (simulation_ended(phil))
 			break ;
 		lock_fork_subroutine(phil, 1);
-		if (death_check(phil) || simulation_ended(phil))
-			break ;
-		if (phil->phils_init->num_of_phils > 1)
-			lock_fork_subroutine(phil, 2);
 		eating_subroutine(phil);
-		if (death_check(phil) || simulation_ended(phil))
-			break ;
+
 		unlock_fork_subroutine(phil);
 		sleeping_subroutine(phil);
-		if (death_check(phil) || simulation_ended(phil))
-			break ;
+
 		thinking_subroutine(phil);
 	}
 	return (NULL);

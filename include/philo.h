@@ -6,7 +6,7 @@
 /*   By: mmaksimo <mmaksimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 22:09:02 by mmaksimo          #+#    #+#             */
-/*   Updated: 2024/09/18 20:29:11 by mmaksimo         ###   ########.fr       */
+/*   Updated: 2024/11/26 14:20:31 by mmaksimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,5 +64,6 @@ void			*monitor_routine(void *arg);
 uint64_t		set_basetime_us(void);
 uint64_t		get_timestamp_us(uint64_t basetime_us);
 void			cleanup(t_phils_init *phils_init, t_phil *phil_arr);
+int				ft_atoi(const char *nptr);
 
 #endif

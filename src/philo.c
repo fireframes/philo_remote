@@ -6,7 +6,7 @@
 /*   By: mmaksimo <mmaksimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/12 15:32:03 by mmaksimo          #+#    #+#             */
-/*   Updated: 2024/11/10 17:07:53 by mmaksimo         ###   ########.fr       */
+/*   Updated: 2024/11/26 18:35:40 by mmaksimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,8 +70,9 @@ int	main(int argc, char *argv[])
 	{
 		phil_arr[i].phil_id = i + 1;
 		phil_arr[i].last_meal_time_us = 0;
-		pthread_mutex_init(&phil_arr[i].is_dead_mutex, NULL);
-		phil_arr[i].is_dead = false;
+		pthread_mutex_init(&phil_arr[i].meal_time_mutex, NULL);
+		// pthread_mutex_init(&phil_arr[i].is_dead_mutex, NULL);
+		// phil_arr[i].is_dead = false;
 		phil_arr[i].phils_init = &phils_init;
 		if (pthread_create(&phil_arr[i].thread_id, NULL, phil_routine, (void*) &phil_arr[i]) != 0)
 		{
@@ -87,32 +88,37 @@ int	main(int argc, char *argv[])
 	if (pthread_create(&monitor_th, NULL, monitor_routine, (void*) phil_arr) != 0)
 	{
 		write(STDERR_FILENO, "Failed to create thread\n", 25);
-		free(phils_init.forks); // frees all?
-		free(phil_arr); // frees all?
+		free(phils_init.forks);
+		free(phil_arr);
 		return (3);
 	}
 
 	int j = 0;
 	while (j < phils_init.num_of_phils)
 	{
-		pthread_mutex_destroy(&phils_init.forks[j]);
+		if (pthread_join(phil_arr[j].thread_id, NULL))
+		{
+		write(STDERR_FILENO, "Failed to join thread\n", 23);
+		return (5);
+		}
 		j++;
 	}
-	pthread_mutex_destroy(&phil_arr[i].is_dead_mutex);
-	pthread_mutex_destroy(&phils_init.stop_simulation_mutex);
-
 	if (pthread_join(monitor_th, NULL) != 0)
 	{
 		write(STDERR_FILENO, "Failed to join thread\n", 23);
 		return (5);
 	}
-	j = 0;
-	while (j < phils_init.num_of_phils)
-	{
-		pthread_join(phil_arr[j].thread_id, NULL);
-		j++;
-	}
 
+	i = 0;
+	while (i < phils_init.num_of_phils)
+	{
+		pthread_mutex_destroy(&phils_init.forks[i]);
+		// pthread_mutex_destroy(&phil_arr[i].is_dead_mutex);
+		pthread_mutex_destroy(&phil_arr[i].meal_time_mutex);
+		i++;
+	}
+	pthread_mutex_destroy(&phils_init.stop_simulation_mutex);
+	
 	free(phils_init.forks);
 	free(phil_arr);
 

@@ -6,7 +6,7 @@
 /*   By: mmaksimo <mmaksimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 22:09:02 by mmaksimo          #+#    #+#             */
-/*   Updated: 2024/11/26 14:20:31 by mmaksimo         ###   ########.fr       */
+/*   Updated: 2024/11/26 18:37:02 by mmaksimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,15 +33,14 @@
 typedef struct s_phils_init
 {
 	int				num_of_phils;
-	int				phil_eat_times;
+	int				num_eat_times;
 	uint64_t		time_to_die;
 	uint64_t		time_to_eat;
 	uint64_t		time_to_sleep;
 	uint64_t		basetime_us;
 	bool			stop_simulation;
 	pthread_mutex_t	stop_simulation_mutex;
-	pthread_mutex_t	*forks; // mutex for accessing pointer
-
+	pthread_mutex_t	*forks;
 }	t_phils_init;
 
 typedef struct s_phil
@@ -50,10 +49,10 @@ typedef struct s_phil
 	pthread_t		thread_id;
 	uint64_t		basetime_phil_us;
 	uint64_t		last_meal_time_us;
+	pthread_mutex_t meal_time_mutex;
 	int				times_eaten;
-	int				forks_taken; // ???
-	pthread_mutex_t	is_dead_mutex;
-	bool			is_dead; // ???
+	// pthread_mutex_t	is_dead_mutex;
+	// bool			is_dead;
 	t_phils_init	*phils_init;
 
 }	t_phil;

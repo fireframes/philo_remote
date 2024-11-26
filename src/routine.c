@@ -6,37 +6,20 @@
 /*   By: mmaksimo <mmaksimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 22:08:50 by mmaksimo          #+#    #+#             */
-/*   Updated: 2024/11/26 14:44:29 by mmaksimo         ###   ########.fr       */
+/*   Updated: 2024/11/26 18:41:19 by mmaksimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-bool	death_check(t_phil *phil)
-{
-	uint64_t	time_us;
-
-	time_us = get_timestamp_us(phil->phils_init->basetime_us);
-	if ((time_us - phil->last_meal_time_us) > phil->phils_init->time_to_die)
-	{
-		pthread_mutex_lock(&phil->is_dead_mutex);
-		phil->is_dead = true;
-		pthread_mutex_unlock(&phil->is_dead_mutex);
-		return (true);
-	}
-	return (false);
-}
-
 bool	simulation_ended(t_phil *phil)
 {
+	bool	ended;
+
 	pthread_mutex_lock(&phil->phils_init->stop_simulation_mutex);
-	if (phil->phils_init->stop_simulation)
-	{
-		pthread_mutex_unlock(&phil->phils_init->stop_simulation_mutex);
-		return (true) ;
-	}
+	ended = phil->phils_init->stop_simulation;
 	pthread_mutex_unlock(&phil->phils_init->stop_simulation_mutex);
-	return (false);
+	return (ended);
 }
 
 void	thinking_subroutine(t_phil *phil)
@@ -54,10 +37,12 @@ void	eating_subroutine(t_phil *phil)
 	uint64_t	time_us;
 
 	time_us = get_timestamp_us(phil->phils_init->basetime_us);
+	pthread_mutex_lock(&phil->meal_time_mutex);
 	phil->last_meal_time_us = get_timestamp_us(phil->phils_init->basetime_us);
+	pthread_mutex_unlock(&phil->meal_time_mutex);
 	printf("%s%li %i is eating%s\n", YELLOW, time_us / 1000, phil->phil_id, NC);
 	usleep(phil->phils_init->time_to_eat);
-
+	// phil->times_eaten++;
 }
 
 void	sleeping_subroutine(t_phil *phil)
@@ -87,9 +72,14 @@ void	unlock_fork_subroutine(t_phil *phil)
 }
 void single_phil_routine(t_phil *phil)
 {
-	return ;
+	lock_fork_subroutine(phil, 1);
+	if (simulation_ended(phil))
+	{
+		unlock_fork_subroutine(phil);
+		pthread_detach(phil->thread_id);
+		return ;
+	}
 }
-
 
 void	*phil_routine(void *arg)
 {
@@ -102,17 +92,29 @@ void	*phil_routine(void *arg)
 		return (NULL);
 	}
 	if (phil->phil_id % 2 == 0)
-		usleep(phil->phils_init->time_to_eat);
+		usleep(1000);
 	while (1)
 	{
 		if (simulation_ended(phil))
-			break ;
+			break;
+
 		lock_fork_subroutine(phil, 1);
+		if (simulation_ended(phil))
+		{
+			unlock_fork_subroutine(phil);
+			break;
+		}
+		lock_fork_subroutine(phil, 2);
+		if (simulation_ended(phil))
+		{
+			unlock_fork_subroutine(phil);
+			break;
+		} 
 		eating_subroutine(phil);
-
 		unlock_fork_subroutine(phil);
+		if (simulation_ended(phil))
+			break;
 		sleeping_subroutine(phil);
-
 		thinking_subroutine(phil);
 	}
 	return (NULL);

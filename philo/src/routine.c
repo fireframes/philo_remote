@@ -6,7 +6,7 @@
 /*   By: mmaksimo <mmaksimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 22:08:50 by mmaksimo          #+#    #+#             */
-/*   Updated: 2024/11/26 18:41:19 by mmaksimo         ###   ########.fr       */
+/*   Updated: 2024/11/26 20:52:16 by mmaksimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ void	eating_subroutine(t_phil *phil)
 	pthread_mutex_unlock(&phil->meal_time_mutex);
 	printf("%s%li %i is eating%s\n", YELLOW, time_us / 1000, phil->phil_id, NC);
 	usleep(phil->phils_init->time_to_eat);
-	// phil->times_eaten++;
+	phil->times_eaten++;
 }
 
 void	sleeping_subroutine(t_phil *phil)
@@ -60,7 +60,7 @@ void	lock_fork_subroutine(t_phil *phil, int fork_num)
 
 	pthread_mutex_lock(&phil->phils_init->forks[phil->phil_id - fork_num]);
 	time_us = get_timestamp_us(phil->phils_init->basetime_us);
-	printf("%s%li %i has taken the fork %s\n", CYAN,
+	printf("%s%li %i has taken a fork%s\n", CYAN,
 			time_us / 1000, phil->phil_id, NC);
 }
 
@@ -96,24 +96,24 @@ void	*phil_routine(void *arg)
 	while (1)
 	{
 		if (simulation_ended(phil))
-			break;
+			break ;
 
 		lock_fork_subroutine(phil, 1);
 		if (simulation_ended(phil))
 		{
 			unlock_fork_subroutine(phil);
-			break;
+			break ;
 		}
 		lock_fork_subroutine(phil, 2);
 		if (simulation_ended(phil))
 		{
 			unlock_fork_subroutine(phil);
-			break;
+			break ;
 		} 
-		eating_subroutine(phil);
+		eating_subroutine(phil);		
 		unlock_fork_subroutine(phil);
 		if (simulation_ended(phil))
-			break;
+			break ;
 		sleeping_subroutine(phil);
 		thinking_subroutine(phil);
 	}

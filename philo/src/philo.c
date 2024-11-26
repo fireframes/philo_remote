@@ -6,7 +6,7 @@
 /*   By: mmaksimo <mmaksimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/12 15:32:03 by mmaksimo          #+#    #+#             */
-/*   Updated: 2024/11/26 18:35:40 by mmaksimo         ###   ########.fr       */
+/*   Updated: 2024/11/26 20:19:36 by mmaksimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,7 @@ int	main(int argc, char *argv[])
 		// pthread_mutex_init(&phil_arr[i].is_dead_mutex, NULL);
 		// phil_arr[i].is_dead = false;
 		phil_arr[i].phils_init = &phils_init;
+		phil_arr[i].times_eaten = 0;
 		if (pthread_create(&phil_arr[i].thread_id, NULL, phil_routine, (void*) &phil_arr[i]) != 0)
 		{
 			write(STDERR_FILENO, "Failed to create thread\n", 25);
@@ -83,6 +84,7 @@ int	main(int argc, char *argv[])
 		}
 		i++;
 	}
+	
 	pthread_t	monitor_th;
 
 	if (pthread_create(&monitor_th, NULL, monitor_routine, (void*) phil_arr) != 0)
@@ -117,11 +119,12 @@ int	main(int argc, char *argv[])
 		pthread_mutex_destroy(&phil_arr[i].meal_time_mutex);
 		i++;
 	}
+	pthread_mutex_destroy(&phils_init.eat_times_mutex);
 	pthread_mutex_destroy(&phils_init.stop_simulation_mutex);
 	
 	free(phils_init.forks);
 	free(phil_arr);
 
-	printf("SIMULATION ENDED.\n");
+	// printf("SIMULATION ENDED.\n");
 	return (0);
 }

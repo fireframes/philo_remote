@@ -6,7 +6,7 @@
 /*   By: mmaksimo <mmaksimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 22:09:02 by mmaksimo          #+#    #+#             */
-/*   Updated: 2024/11/26 18:37:02 by mmaksimo         ###   ########.fr       */
+/*   Updated: 2024/11/26 20:15:41 by mmaksimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,12 +33,13 @@
 typedef struct s_phils_init
 {
 	int				num_of_phils;
-	int				num_eat_times;
 	uint64_t		time_to_die;
 	uint64_t		time_to_eat;
 	uint64_t		time_to_sleep;
+	int				num_eat_times;
 	uint64_t		basetime_us;
 	bool			stop_simulation;
+	pthread_mutex_t	eat_times_mutex;
 	pthread_mutex_t	stop_simulation_mutex;
 	pthread_mutex_t	*forks;
 }	t_phils_init;

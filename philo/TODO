@@ -6,7 +6,7 @@
 
 2. implement times_eaten
 
-3. 
+3.
 
 
 			// pthread_mutex_lock(&phil_arr[i].is_dead_mutex);
@@ -19,8 +19,21 @@
 			// 	uint64_t	time_us;
 			// 	time_us = get_timestamp_us(phil_arr[i].phils_init->basetime_us);
 			// 	printf("%s%li %i died%s\n", BLACK, time_us / 1000, phil_arr[i].phil_id, NC);
-				
+
 			// 	pthread_mutex_unlock(&phil_arr[i].is_dead_mutex);
 			// 	return (NULL);
 			// }
 			// pthread_mutex_unlock(&phil_arr[i].is_dead_mutex);
+
+
+	// if (phil->phils_init->num_of_phils % 2 != 0)
+	// {
+	// 	if (phil->phil_id % 2 != 0)
+	// 		usleep(100);
+	// }
+	// else
+	// {
+	// 	if (phil->phil_id % 2 == 0)
+	// 		usleep(200);
+	// }
+	// 	usleep(1000);

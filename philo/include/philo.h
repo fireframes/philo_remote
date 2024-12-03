@@ -6,7 +6,7 @@
 /*   By: mmaksimo <mmaksimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 22:09:02 by mmaksimo          #+#    #+#             */
-/*   Updated: 2024/11/26 20:15:41 by mmaksimo         ###   ########.fr       */
+/*   Updated: 2024/12/03 23:03:50 by mmaksimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,14 @@ typedef struct s_phils_init
 	uint64_t		time_to_sleep;
 	int				num_eat_times;
 	uint64_t		basetime_us;
-	bool			stop_simulation;
+	pthread_mutex_t	*forks;
 	pthread_mutex_t	eat_times_mutex;
 	pthread_mutex_t	stop_simulation_mutex;
-	pthread_mutex_t	*forks;
+	bool			stop_simulation;
+	pthread_mutex_t	death_mutex;
+	bool			phil_died;
+	pthread_mutex_t	print_mutex;
+
 }	t_phils_init;
 
 typedef struct s_phil
@@ -50,20 +54,19 @@ typedef struct s_phil
 	pthread_t		thread_id;
 	uint64_t		basetime_phil_us;
 	uint64_t		last_meal_time_us;
-	pthread_mutex_t meal_time_mutex;
 	int				times_eaten;
-	// pthread_mutex_t	is_dead_mutex;
-	// bool			is_dead;
 	t_phils_init	*phils_init;
-
 }	t_phil;
 
-t_phils_init	*init_phils(t_phils_init *phils_init, int argc, char *argv[]);
+t_phils_init	*init_phils(t_phils_init *phils_init, char *argv[]);
 void			*phil_routine(void *arg);
 void			*monitor_routine(void *arg);
 uint64_t		set_basetime_us(void);
 uint64_t		get_timestamp_us(uint64_t basetime_us);
-void			cleanup(t_phils_init *phils_init, t_phil *phil_arr);
+void			print_state(t_phil *phil, char *state, char *color);
+bool			simulation_ended(t_phil *phil);
 int				ft_atoi(const char *nptr);
+int				ft_strcmp(const char *s1, const char *s2);
+void			cleanup(t_phils_init *phils_init, t_phil *phil_arr);
 
 #endif

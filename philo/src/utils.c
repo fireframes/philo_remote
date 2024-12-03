@@ -6,7 +6,7 @@
 /*   By: mmaksimo <mmaksimo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 22:17:04 by mmaksimo          #+#    #+#             */
-/*   Updated: 2024/11/26 14:20:14 by mmaksimo         ###   ########.fr       */
+/*   Updated: 2024/12/03 21:47:53 by mmaksimo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,4 +55,21 @@ int	ft_atoi(const char *nptr)
 	}
 	num /= 10;
 	return ((int) num * neg);
+}
+
+int	ft_strcmp(const char *s1, const char *s2)
+{
+	size_t	i;
+	int		diff;
+
+	i = 0;
+	diff = 0;
+	while (s1[i] && s2[i])
+	{
+		if (s1[i] != s2[i])
+			break ;
+		i++;
+	}
+	diff = (unsigned char) s1[i] - (unsigned char) s2[i];
+	return (diff);
 }

@@ -1,7 +1,7 @@
 NAME		:=	philo
 
 CFLAGS		:=	-Wextra -Wall -Werror -g
-LDFLAGS		:=	-pthread
+LDFLAGS		:=	-fsanitize=thread
 
 HEADERS		:=	-Iinclude
 
